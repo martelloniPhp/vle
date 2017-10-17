@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -28,40 +28,50 @@
 #ifndef VLE_DEVS_DYNAMICS_INIT_HPP
 #define VLE_DEVS_DYNAMICS_INIT_HPP
 
-namespace vle { namespace devs {
+#include <vle/utils/Context.hpp>
+#include <vle/utils/PackageTable.hpp>
+
+namespace vle {
+namespace vpz {
+
+class AtomicModel;
+
+} // vpz
+
+namespace devs {
 
 class Coordinator;
 
 struct DynamicsInit
 {
-    utils::ContextPtr       context;
+    utils::ContextPtr context;
     const vpz::AtomicModel& model;
-    PackageId               packageid;
+    utils::PackageTable::index packageid;
 };
 
 struct DynamicsCompInit
 {
-    utils::ContextPtr       context;
+    utils::ContextPtr context;
     const vpz::MultiComponent& model;
-    PackageId               packageid;
+    utils::PackageTable::index packageid;
 };
 
 struct ExecutiveInit
 {
-    Coordinator&            coordinator;
-    utils::ContextPtr       context;
+    Coordinator& coordinator;
+    utils::ContextPtr context;
     const vpz::AtomicModel& model;
-    PackageId               packageid;
+    utils::PackageTable::index packageid;
 };
 
 struct DynamicsWrapperInit
 {
-    const std::string&      library;
-    utils::ContextPtr       context;
+    const std::string& library;
+    utils::ContextPtr context;
     const vpz::AtomicModel& model;
-    PackageId               packageid;
+    utils::PackageTable::index packageid;
 };
-
-}} // namespace vle devs
+}
+} // namespace vle devs
 
 #endif

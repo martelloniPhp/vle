@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -23,6 +23,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 
 
 #include <vle/vpz/CoupledModel.hpp>
@@ -45,30 +46,35 @@ BaseModel::BaseModel(const std::string& name, CoupledModel* parent) :
     m_width(-1),
     m_height(-1),
     m_name(name)
+
 {
     if (parent) {
         parent->addModel(this);
     }
 }
 
-BaseModel::BaseModel(const BaseModel& mdl) :
-    m_parent(nullptr),
-    m_inPortList(mdl.m_inPortList),
-    m_outPortList(mdl.m_outPortList),
-    m_x(mdl.m_x),
-    m_y(mdl.m_y),
-    m_width(mdl.m_width),
-    m_height(mdl.m_height),
-    m_name(mdl.m_name)
+
+BaseModel::BaseModel(const BaseModel& mdl)
+  : m_parent(nullptr)
+  , m_inPortList(mdl.m_inPortList)
+  , m_outPortList(mdl.m_outPortList)
+  , m_x(mdl.m_x)
+  , m_y(mdl.m_y)
+  , m_width(mdl.m_width)
+  , m_height(mdl.m_height)
+  , m_name(mdl.m_name)
 {
-    std::for_each(mdl.m_inPortList.begin(), mdl.m_inPortList.end(),
+    std::for_each(mdl.m_inPortList.begin(),
+                  mdl.m_inPortList.end(),
                   CopyWithoutConnection(m_inPortList));
 
-    std::for_each(mdl.m_outPortList.begin(), mdl.m_outPortList.end(),
+    std::for_each(mdl.m_outPortList.begin(),
+                  mdl.m_outPortList.end(),
                   CopyWithoutConnection(m_outPortList));
 }
 
 void BaseModel::swap(BaseModel& mdl)
+
 {
     std::swap(m_parent, mdl.m_parent);
     std::swap(m_inPortList, mdl.m_inPortList);
@@ -80,10 +86,11 @@ void BaseModel::swap(BaseModel& mdl)
     std::swap(m_name, mdl.m_name);
 }
 
+
 void BaseModel::getAtomicModelsSource(const std::string& portname,
-                                  ModelPortList& result)
+                                 ModelPortList& result)
 {
-    std::stack < std::pair < ModelPortList*, BaseModel* > > stack;
+    std::stack<std::pair<ModelPortList*, BaseModel*>> stack;
 
     stack.push(std::make_pair(&getInPort(portname), this));
 
@@ -102,21 +109,22 @@ void BaseModel::getAtomicModelsSource(const std::string& portname,
             } else {
                 CoupledModel* cpled = mdl->toCoupled();
                 if (cpled == source->getParent()) {
-                    stack.push(std::make_pair(
-                            &cpled->getInPort(port), mdl));
+
+                    stack.push(std::make_pair(&cpled->getInPort(port), mdl));
                 } else {
-                    stack.push(std::make_pair(
-                            &cpled->getInternalOutPort(port), mdl));
+                    stack.push(
+                      std::make_pair(&cpled->getInternalOutPort(port), mdl));
                 }
             }
         }
     }
 }
 
+
 void BaseModel::getAtomicModelsTarget(const std::string& portname,
-                                  ModelPortList& result)
+                                 ModelPortList& result)
 {
-    std::stack < std::pair < ModelPortList*, BaseModel* > > stack;
+    std::stack<std::pair<ModelPortList*, BaseModel*>> stack;
 
     stack.push(std::make_pair(&getOutPort(portname), this));
 
@@ -130,27 +138,28 @@ void BaseModel::getAtomicModelsTarget(const std::string& portname,
             const std::string& port(it->second);
             BaseModel* mdl(it->first);
 
+
             if (mdl->isAtomic() || mdl->isMulti()) {
                 result.add(mdl, port);
             } else {
                 CoupledModel* cpled = mdl->toCoupled();
                 if (cpled == source->getParent()) {
-                    stack.push(std::make_pair(
-                            &cpled->getOutPort(port), mdl));
+                    stack.push(std::make_pair(&cpled->getOutPort(port), mdl));
                 } else {
-                    stack.push(std::make_pair(
-                            &cpled->getInternalInPort(port), mdl));
+                    stack.push(
+                      std::make_pair(&cpled->getInternalInPort(port), mdl));
                 }
             }
         }
     }
 }
 
+
 void BaseModel::rename(BaseModel* mdl, const std::string& newname)
 {
     if (not mdl) {
         throw utils::DevsGraphError(
-            (fmt(_("Cannot rename empty model with '%1%'")) % newname).str());
+          (fmt(_("Cannot rename empty model with '%1%'")) % newname).str());
     }
 
     CoupledModel* parent = mdl->getParent();
@@ -159,27 +168,29 @@ void BaseModel::rename(BaseModel* mdl, const std::string& newname)
 
         if (it == parent->getModelList().end()) {
             throw utils::DevsGraphError(
-                _("Cannot rename a model without parent"));
+              _("Cannot rename a model without parent"));
         }
 
-	auto itfind = parent->getModelList().find(newname);
-	if (itfind != parent->getModelList().end()) {
-	    throw utils::DevsGraphError(
-                (fmt(_("Coupled model %1% already has submodel %2%"))
-                 % parent->getName() % newname).str());
-	} else {
-	    mdl->m_name.assign(newname);
-	    parent->getModelList().erase(it);
-	    parent->addModel(mdl);
-	}
+        auto itfind = parent->getModelList().find(newname);
+        if (itfind != parent->getModelList().end()) {
+            throw utils::DevsGraphError(
+              (fmt(_("Coupled model %1% already has submodel %2%")) %
+               parent->getName() % newname)
+                .str());
+        } else {
+            mdl->m_name.assign(newname);
+            parent->getModelList().erase(it);
+            parent->addModel(mdl);
+        }
     } else {
         mdl->m_name.assign(newname);
     }
 }
 
+
 std::string BaseModel::getParentName() const
 {
-    std::list < std::string > lst;
+    std::list<std::string> lst;
     CoupledModel* parent = m_parent;
 
     while (parent) {
@@ -200,8 +211,8 @@ std::string BaseModel::getParentName() const
 
 std::string BaseModel::getCompleteName() const
 {
-    std::list < const BaseModel* > stack;
-    std::list < const BaseModel* >::iterator it, jt;
+    std::list<const BaseModel*> stack;
+    std::list<const BaseModel *>::iterator it, jt;
     std::string result;
 
     stack.push_back(this);
@@ -232,8 +243,8 @@ void BaseModel::getParents(CoupledModelVector& parents) const
     }
 }
 
-BaseModel* BaseModel::getModel(const CoupledModelVector& lst,
-                                 const std::string& name)
+
+BaseModel* BaseModel::getModel(const CoupledModelVector& lst, const std::string& name)
 {
     if (lst.empty()) {
         return findModel(name);
@@ -242,13 +253,14 @@ BaseModel* BaseModel::getModel(const CoupledModelVector& lst,
             throw utils::DevsGraphError(_("Bad use of getModel from a list"));
         }
         auto it = lst.rbegin();
-        CoupledModel* top = static_cast < CoupledModel* >(this);
+        CoupledModel* top = static_cast<CoupledModel*>(this);
         CoupledModel* other = *it;
 
         if (other->getName() != top->getName()) {
             throw utils::DevsGraphError(
-                (fmt(_("Get model have not the same name '%1%' and '%2%'"))
-                 % top->getName() % other->getName()).str());
+              (fmt(_("Get model have not the same name '%1%' and '%2%'")) %
+               top->getName() % other->getName())
+                .str());
         }
 
         it++;
@@ -259,22 +271,24 @@ BaseModel* BaseModel::getModel(const CoupledModelVector& lst,
 
             if (not tmp) {
                 throw utils::DevsGraphError(
-                    (fmt(_("Model '%1%' not found")) % other->getName()).str());
+                  (fmt(_("Model '%1%' not found")) % other->getName()).str());
             }
 
             if (not tmp->isCoupled()) {
                 throw utils::DevsGraphError(
-                    (fmt(_("Model '%1%' is not a coupled model"))
-                     % other->getName()).str());
+                  (fmt(_("Model '%1%' is not a coupled model")) %
+                   other->getName())
+                    .str());
             }
 
             if (tmp->getName() != other->getName()) {
                 throw utils::DevsGraphError(
-                    (fmt(_("Model '%1%' have not the same parent")) %
-                     other->getName()).str());
+                  (fmt(_("Model '%1%' have not the same parent")) %
+                   other->getName())
+                    .str());
             }
 
-            top = static_cast < CoupledModel* >(tmp);
+            top = static_cast<CoupledModel*>(tmp);
             ++it;
         }
 
@@ -284,10 +298,10 @@ BaseModel* BaseModel::getModel(const CoupledModelVector& lst,
 
 BaseModel* BaseModel::findModelFromPath(const std::string& path) const
 {
-    std::vector < std::string > splitVect;
+    std::vector<std::string> splitVect;
     boost::split(splitVect, path, boost::is_any_of(","));
-    std::vector < std::string >::const_iterator it = splitVect.begin();
-    std::vector < std::string >::const_iterator ite = splitVect.end();
+    std::vector<std::string>::const_iterator it = splitVect.begin();
+    std::vector<std::string>::const_iterator ite = splitVect.end();
     BaseModel* currModel = nullptr;
     const CoupledModel* currCoupledModel = nullptr;
     for (; it != ite; it++) {
@@ -296,14 +310,13 @@ BaseModel* BaseModel::findModelFromPath(const std::string& path) const
                 return nullptr;
             }
             currCoupledModel = static_cast<const CoupledModel*>(this);
-        }else{
+        } else {
             if (currModel->isAtomic()) {
                 return nullptr;
             }
             currCoupledModel = static_cast<const CoupledModel*>(currModel);
         }
-        auto itml =
-            currCoupledModel->getModelList().find(*it);
+        auto itml = currCoupledModel->getModelList().find(*it);
         if (itml == currCoupledModel->getModelList().end()) {
             return nullptr;
         }
@@ -312,44 +325,49 @@ BaseModel* BaseModel::findModelFromPath(const std::string& path) const
     return currModel;
 }
 
+
 ModelPortList& BaseModel::addInputPort(const std::string& name)
 {
     auto it(m_inPortList.find(name));
     if (it == m_inPortList.end()) {
         if (isCoupled()) {
-            CoupledModel* cpl = static_cast < CoupledModel* >(this);
+            CoupledModel* cpl = static_cast<CoupledModel*>(this);
             cpl->getInternalInputPortList().insert(
-                ConnectionList::value_type(name, ModelPortList()));
+              ConnectionList::value_type(name, ModelPortList()));
         }
-        return (*m_inPortList.insert(
-                ConnectionList::value_type(
-                    name, ModelPortList())).first).second;
+        return (*m_inPortList
+                   .insert(ConnectionList::value_type(name, ModelPortList()))
+                   .first)
+          .second;
     } else {
         return it->second;
     }
 }
+
 
 ModelPortList& BaseModel::addOutputPort(const std::string& name)
 {
     auto it(m_outPortList.find(name));
     if (it == m_outPortList.end()) {
         if (isCoupled()) {
-            CoupledModel* cpl = static_cast < CoupledModel* >(this);
+            CoupledModel* cpl = static_cast<CoupledModel*>(this);
             cpl->getInternalOutputPortList().insert(
-                ConnectionList::value_type(name, ModelPortList()));
+              ConnectionList::value_type(name, ModelPortList()));
         }
-        return (*m_outPortList.insert(
-                ConnectionList::value_type(name,
-                                           ModelPortList())).first).second;
+        return (*m_outPortList
+                   .insert(ConnectionList::value_type(name, ModelPortList()))
+                   .first)
+          .second;
     } else {
         return it->second;
     }
 }
 
+
 void BaseModel::delInputPort(const std::string& name)
 {
     ModelPortList& lst(getInPort(name));
-    for (auto & elem : lst) {
+    for (auto& elem : lst) {
         if (elem.first != m_parent) {
             ModelPortList& toclean(elem.first->getOutPort(elem.second));
             toclean.erase(this);
@@ -359,24 +377,24 @@ void BaseModel::delInputPort(const std::string& name)
         }
     }
     if (isCoupled()) {
-	CoupledModel* tmp(toCoupled(this));
-	ModelPortList& intern(tmp->getInternalInPort(name));
-	auto jt = intern.begin();
-	while(jt != intern.end()) {
-	    jt->first->getInPort(jt->second).erase(this);
-	    ++jt;
-	}
-	intern.clear();
+        CoupledModel* tmp(toCoupled(this));
+        ModelPortList& intern(tmp->getInternalInPort(name));
+        auto jt = intern.begin();
+        while (jt != intern.end()) {
+            jt->first->getInPort(jt->second).erase(this);
+            ++jt;
+        }
+        intern.clear();
     }
 
     lst.clear();
     m_inPortList.erase(name);
 }
 
-void BaseModel::delOutputPort(const std::string & name)
+void BaseModel::delOutputPort(const std::string& name)
 {
     ModelPortList& lst(getOutPort(name));
-    for(auto & elem : lst) {
+    for (auto& elem : lst) {
         if (elem.first != m_parent) {
             ModelPortList& toclean(elem.first->getInPort(elem.second));
             toclean.erase(this);
@@ -386,67 +404,69 @@ void BaseModel::delOutputPort(const std::string & name)
         }
     }
     if (isCoupled()) {
-	CoupledModel* tmp(toCoupled(this));
-	ModelPortList& intern(tmp->getInternalOutPort(name));
-	auto jt = intern.begin();
-	while(jt != intern.end()) {
-	    jt->first->getOutPort(jt->second).erase(this);
-	    ++jt;
-	}
-	intern.clear();
+        CoupledModel* tmp(toCoupled(this));
+        ModelPortList& intern(tmp->getInternalOutPort(name));
+        auto jt = intern.begin();
+        while (jt != intern.end()) {
+            jt->first->getOutPort(jt->second).erase(this);
+            ++jt;
+        }
+        intern.clear();
     }
 
     lst.clear();
     m_outPortList.erase(name);
 }
 
-void BaseModel::addInPort(ModelPortList&  model, ModelPortList& intern,
-		      const std::string& name)
+void BaseModel::addInPort(ModelPortList& model,
+                     ModelPortList& intern,
+                     const std::string& name)
 {
-    for (auto & elem : model) {
-	if (elem.first != m_parent) {
-	    elem.first->getOutPort(elem.second).add(this, name);
-	} else {
-	    m_parent->getInternalInPort(elem.second).add(this, name);
-	}
+    for (auto& elem : model) {
+        if (elem.first != m_parent) {
+            elem.first->getOutPort(elem.second).add(this, name);
+        } else {
+            m_parent->getInternalInPort(elem.second).add(this, name);
+        }
     }
     if (isCoupled()) {
-	auto jt = intern.begin();
-	while (jt != intern.end()) {
-	    jt->first->getInPort(jt->second).add(this, name);
-	    ++jt;
-	}
+        auto jt = intern.begin();
+        while (jt != intern.end()) {
+            jt->first->getInPort(jt->second).add(this, name);
+            ++jt;
+        }
     }
 }
 
-void BaseModel::addOutPort(ModelPortList&  model, ModelPortList& intern,
-			       const std::string& name)
+void BaseModel::addOutPort(ModelPortList& model,
+                      ModelPortList& intern,
+                      const std::string& name)
 {
-    for (auto & elem : model) {
-	if (elem.first != m_parent) {
-	    elem.first->getInPort(elem.second).add(this, name);
-	} else {
-	    m_parent->getInternalOutPort(elem.second).add(this, name);
-	}
+    for (auto& elem : model) {
+        if (elem.first != m_parent) {
+            elem.first->getInPort(elem.second).add(this, name);
+        } else {
+            m_parent->getInternalOutPort(elem.second).add(this, name);
+        }
     }
     if (isCoupled()) {
-	auto jt = intern.begin();
-	while (jt != intern.end()) {
-	    jt->first->getOutPort(jt->second).add(this, name);
-	    ++jt;
-	}
+        auto jt = intern.begin();
+        while (jt != intern.end()) {
+            jt->first->getOutPort(jt->second).add(this, name);
+            ++jt;
+        }
     }
 }
 
 ModelPortList& BaseModel::renameInputPort(const std::string& old_name,
-				      const std::string& new_name)
+                           const std::string& new_name)
 {
     auto iter = getInputPortList().find(old_name);
     ModelPortList connect(iter->second);
     ModelPortList internalConnect;
     if (isCoupled()) {
-	CoupledModel* tmp(toCoupled(this));
-	internalConnect = tmp->getInternalInPort(old_name);
+        CoupledModel* tmp(toCoupled(this));
+        internalConnect = tmp->getInternalInPort(old_name);
 
     }
 
@@ -454,65 +474,70 @@ ModelPortList& BaseModel::renameInputPort(const std::string& old_name,
 
     auto it(m_inPortList.find(new_name));
     if (it == m_inPortList.end()) {
-	if (isCoupled()) {
-	    CoupledModel* cpl = static_cast < CoupledModel* >(this);
-	    cpl->getInternalInputPortList().insert(
-                ConnectionList::value_type(new_name, internalConnect));
-	}
-	addInPort(connect, internalConnect,  new_name);
-	return (*m_inPortList.insert(
-                ConnectionList::value_type(new_name, connect)).first).second;
+        if (isCoupled()) {
+            CoupledModel* cpl = static_cast<CoupledModel*>(this);
+            cpl->getInternalInputPortList().insert(
+              ConnectionList::value_type(new_name, internalConnect));
+        }
+        addInPort(connect, internalConnect, new_name);
+        return (*m_inPortList
+                   .insert(ConnectionList::value_type(new_name, connect))
+                   .first)
+          .second;
     } else {
-	return it->second;
+        return it->second;
     }
 }
 
-ModelPortList& BaseModel::renameOutputPort(const std::string& old_name,
-				       const std::string& new_name)
+ModelPortList&
+BaseModel::renameOutputPort(const std::string& old_name,
+                            const std::string& new_name)
 {
     auto iter = getOutputPortList().find(old_name);
     ModelPortList connect(iter->second);
     ModelPortList internalConnect;
     if (isCoupled()) {
-	CoupledModel* tmp(toCoupled(this));
-	internalConnect = tmp->getInternalOutPort(old_name);
+        CoupledModel* tmp(toCoupled(this));
+        internalConnect = tmp->getInternalOutPort(old_name);
     }
-
 
     delOutputPort(old_name);
 
     auto it(m_outPortList.find(new_name));
     if (it == m_outPortList.end()) {
-	if (isCoupled()) {
-	    CoupledModel* cpl = static_cast < CoupledModel* >(this);
-	    cpl->getInternalOutputPortList().insert(
-                ConnectionList::value_type(new_name, internalConnect));
-	}
-	addOutPort(connect, internalConnect, new_name);
-	return (*m_outPortList.insert(
-                ConnectionList::value_type(new_name, connect)).first).second;
+            CoupledModel* cpl = static_cast<CoupledModel*>(this);
+            cpl->getInternalOutputPortList().insert(
+              ConnectionList::value_type(new_name, internalConnect));
+        }
+        addOutPort(connect, internalConnect, new_name);
+        return (*m_outPortList
+                   .insert(ConnectionList::value_type(new_name, connect))
+                   .first)
+          .second;
     } else {
-	return it->second;
+        return it->second;
     }
 }
 
-void BaseModel::addInputPort(const std::list < std::string > & lst)
+void BaseModel::addInputPort(const std::list<std::string>& lst)
 {
     std::for_each(lst.begin(), lst.end(), AddInputPort(*this));
 }
 
-void BaseModel::addOutputPort(const std::list < std::string > & lst)
+void BaseModel::addOutputPort(const std::list<std::string>& lst)
 {
     std::for_each(lst.begin(), lst.end(), AddOutputPort(*this));
 }
+
 
 const ModelPortList& BaseModel::getInPort(const std::string& name) const
 {
     auto it = m_inPortList.find(name);
     if (it == m_inPortList.end()) {
         throw utils::DevsGraphError(
-            (fmt(_("Coupled model %1% have no input port %2%"))
-             % getName() % name).str());
+          (fmt(_("Coupled model %1% have no input port %2%")) % getName() %
+           name)
+            .str());
     }
 
     return it->second;
@@ -523,8 +548,9 @@ const ModelPortList& BaseModel::getOutPort(const std::string& name) const
     auto it = m_outPortList.find(name);
     if (it == m_outPortList.end()) {
         throw utils::DevsGraphError(
-            (fmt(_("Coupled model %1% have no output port %2%"))
-             % getName() % name).str());
+          (fmt(_("Coupled model %1% have no output port %2%")) % getName() %
+           name)
+            .str());
     }
 
     return it->second;
@@ -535,31 +561,35 @@ ModelPortList& BaseModel::getInPort(const std::string& name)
     auto it = m_inPortList.find(name);
     if (it == m_inPortList.end()) {
         throw utils::DevsGraphError(
-            (fmt(_("Model %1% have no input port %2%"))
-             % getName() % name).str());
+          (fmt(_("Model %1% have no input port %2%")) % getName() % name)
+            .str());
     }
 
     return it->second;
 }
+
 
 ModelPortList& BaseModel::getOutPort(const std::string& name)
 {
     auto it = m_outPortList.find(name);
     if (it == m_outPortList.end()) {
         throw utils::DevsGraphError(
-            (fmt(_("Model %1% have no output port %2%")) % getName()
-             % name).str());
+
+          (fmt(_("Model %1% have no output port %2%")) % getName() % name)
+            .str());
     }
 
     return it->second;
 }
+
 
 bool BaseModel::existInputPort(const std::string & name)
 {
     return m_inPortList.find(name) != m_inPortList.end();
 }
 
-bool BaseModel::existOutputPort(const std::string & name)
+
+bool BaseModel::existOutputPort(const std::string& name)
 {
     return m_outPortList.find(name) != m_outPortList.end();
 }
@@ -570,12 +600,13 @@ int BaseModel::getInputPortIndex(const std::string& name) const
 
     if (it == m_inPortList.end()) {
         throw utils::DevsGraphError(
-            (fmt(_("Input port %1% not exist in model %2%"))
-             % name % getName()).str());
+          (fmt(_("Input port %1% not exist in model %2%")) % name % getName())
+            .str());
     }
 
     return std::distance(m_inPortList.begin(), it);
 }
+
 
 int BaseModel::getOutputPortIndex(const std::string& name) const
 {
@@ -583,12 +614,13 @@ int BaseModel::getOutputPortIndex(const std::string& name) const
 
     if (it == m_outPortList.end()) {
         throw utils::DevsGraphError(
-            (fmt(_("Output port %1% not exist in model %2%")) % name %
-             getName()).str());
+          (fmt(_("Output port %1% not exist in model %2%")) % name % getName())
+            .str());
     }
 
     return std::distance(m_outPortList.begin(), it);
 }
+
 
 void BaseModel::writePortListXML(std::ostream& out) const
 {
@@ -596,7 +628,7 @@ void BaseModel::writePortListXML(std::ostream& out) const
         out << "<in>\n";
 
         auto it = m_inPortList.begin();
-        for (;it != m_inPortList.end(); ++it) {
+        for (; it != m_inPortList.end(); ++it) {
             out << "<port name=\"" << (*it).first.c_str() << "\" />\n";
         }
         out << "</in>\n";
@@ -604,13 +636,14 @@ void BaseModel::writePortListXML(std::ostream& out) const
 
     if (not m_outPortList.empty()) {
         out << "<out>\n";
-	auto it = m_outPortList.begin();
-        for(; it != m_outPortList.end(); ++it) {
+        auto it = m_outPortList.begin();
+        for (; it != m_outPortList.end(); ++it) {
             out << "<port name=\"" << (*it).first.c_str() << "\" />\n";
-	}
+        }
         out << "</out>\n";
     }
 }
+
 
 void BaseModel::writeGraphics(std::ostream& out) const
 {
@@ -628,12 +661,13 @@ void BaseModel::writeGraphics(std::ostream& out) const
     }
 }
 
+
 void BaseModel::writePort(std::ostream& out) const
 {
     const vpz::ConnectionList& ins(getInputPortList());
     if (not ins.empty()) {
         out << "<in>\n";
-        for (const auto & in : ins) {
+        for (const auto& in : ins) {
             out << " <port name=\"" << in.first.c_str() << "\" />\n";
         }
         out << "</in>\n";
@@ -642,11 +676,12 @@ void BaseModel::writePort(std::ostream& out) const
     const vpz::ConnectionList& outs(getOutputPortList());
     if (not outs.empty()) {
         out << "<out>\n";
-        for (const auto & outs_it : outs) {
+        for (const auto& outs_it : outs) {
             out << " <port name=\"" << outs_it.first.c_str() << "\" />\n";
         }
         out << "</out>\n";
     }
+
 
 }
 
@@ -658,6 +693,7 @@ AtomicModel* BaseModel::toAtomic(BaseModel* model)
     return nullptr;
 }
 
+
 CoupledModel* BaseModel::toCoupled(BaseModel* model)
 {
     if (model and model->isCoupled()) {
@@ -665,6 +701,7 @@ CoupledModel* BaseModel::toCoupled(BaseModel* model)
     }
     return nullptr;
 }
+
 MultiComponent* BaseModel::toMulti(BaseModel* model)
 {
     if (model and model->isMulti()) {
@@ -720,17 +757,17 @@ void BaseModel::getModelList(BaseModel* model,
     }
 }
 
-void BaseModel::getAtomicModelList(BaseModel* model,
-                               AtomicModelVector& list)
+void BaseModel::getAtomicModelList(BaseModel* model, AtomicModelVector& list)
 {
     if (model->isAtomic()) {
         list.push_back((AtomicModel*)model);
-    }else {
-	std::list < CoupledModel* > coupledModelList;
-	coupledModelList.push_back((CoupledModel*)model);
+    } else {
+        std::list<CoupledModel*> coupledModelList;
+        coupledModelList.push_back((CoupledModel*)model);
         while (!coupledModelList.empty()) {
             CoupledModel* m = coupledModelList.front();
             ModelList& v(m->getModelList());
+
 
             for (auto & elem : v) {
 		BaseModel* n = elem.second;
@@ -775,12 +812,13 @@ bool BaseModel::isInList(const ModelList& lst, BaseModel* m)
     return lst.find(m->getName()) != lst.end();
 }
 
-BaseModel::BaseModel() :
-    m_parent(nullptr),
-    m_x(-1),
-    m_y(-1),
-    m_width(-1),
-    m_height(-1)
+
+BaseModel::BaseModel()
+  : m_parent(nullptr)
+  , m_x(-1)
+  , m_y(-1)
+  , m_width(-1)
+  , m_height(-1)
 {
     throw utils::NotYetImplemented("BaseModel::BaseModel not developed");
 }
@@ -791,3 +829,4 @@ BaseModel& BaseModel::operator=(const BaseModel& /* mdl */)
 }
 
 }} // namespace vle vpz
+

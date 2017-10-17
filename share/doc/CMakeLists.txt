@@ -1,0 +1,1 @@
+install(FILES README WIN_build.txt DESTINATION ${VLE_SHARE_DIRS}/doc)

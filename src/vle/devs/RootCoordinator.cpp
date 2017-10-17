@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -24,24 +24,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <vle/devs/RootCoordinator.hpp>
 #include <cassert>
+#include <vle/devs/RootCoordinator.hpp>
 
-namespace vle { namespace devs {
+namespace vle {
+namespace devs {
 
 RootCoordinator::RootCoordinator(utils::ContextPtr context)
-    : m_context(context)
-    , m_rand(0)
-    , m_begin(0)
-    , m_currentTime(0)
-    , m_end(1.0)
-    , m_coordinator(nullptr)
-    , m_root(nullptr)
+  : m_context(context)
+  , m_rand(0)
+  , m_begin(0)
+  , m_currentTime(0)
+  , m_end(1.0)
+  , m_coordinator(nullptr)
+  , m_root(nullptr)
 {
 }
 
 RootCoordinator::~RootCoordinator() = default;
+
 
 void RootCoordinator::load(vpz::Vpz& io)
 {
@@ -59,14 +60,15 @@ void RootCoordinator::load(vpz::Vpz& io)
     m_root = io.project().model().graph();
 }
 
+
 void RootCoordinator::init()
 {
     m_currentTime = m_begin;
 }
 
+
 bool RootCoordinator::run()
 {
-	//std::cout << "root run" << std::endl;
     m_currentTime = m_coordinator->getCurrentTime();
 
     if (isInfinity(m_currentTime))
@@ -77,7 +79,6 @@ bool RootCoordinator::run()
 
     m_coordinator->run();
 
-
     return true;
 }
 
@@ -85,10 +86,10 @@ std::unique_ptr<value::Map> RootCoordinator::finish()
 {
     if (m_coordinator) {
         return m_coordinator->finish();
-
     }
     return {};
 }
+
 
 std::unique_ptr<value::Map> RootCoordinator::outputs() const
 {
@@ -97,5 +98,5 @@ std::unique_ptr<value::Map> RootCoordinator::outputs() const
     }
     return {};
 }
-
-}} // namespace vle devs
+}
+} // namespace vle devs
