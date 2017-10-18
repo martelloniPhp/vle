@@ -506,7 +506,7 @@ void SaxParser::onTuple(const xmlChar**)
     m_valuestack.pushTuple();
 }
 
-void Parser::onTable(const xmlChar** att)
+void SaxParser::onTable(const xmlChar** att)
 {
     const xmlChar* width = nullptr;
     const xmlChar* height = nullptr;

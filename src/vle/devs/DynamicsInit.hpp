@@ -35,6 +35,7 @@ namespace vle {
 namespace vpz {
 
 class AtomicModel;
+class MultiComponent;
 
 } // vpz
 

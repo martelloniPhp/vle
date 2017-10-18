@@ -1,7 +1,7 @@
 add_sources(vlelib Coordinator.cpp DynamicsComp.cpp Dynamics.cpp DynamicsDbg.cpp
   DynamicsWrapper.cpp Executive.cpp ExternalEvent.cpp 
   ExternalEventList.cpp InitEventList.cpp InternalEvent.cpp ModelFactory.cpp
-  RootCoordinator.cpp Scheduler.cpp SimulatorMulti.cpp SimulatorAtomic.cpp Time.cpp View.cpp
+  RootCoordinator.cpp SimulatorMulti.cpp SimulatorAtomic.cpp Scheduler.cpp Time.cpp View.cpp
   ViewEvent.cpp)
 
 install(FILES Dynamics.hpp DynamicsComp.hpp DynamicsWrapper.hpp Executive.hpp

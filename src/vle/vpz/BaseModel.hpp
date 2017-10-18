@@ -363,6 +363,8 @@ public:
      */
     static CoupledModel* toCoupled(BaseModel* m);
 
+    static MultiComponent* toMulti(BaseModel* model);
+
     /**
      * @brief Cast the current vpz::Model to vpz::CoupledModel.
      *
@@ -384,9 +386,22 @@ public:
     {
         return toAtomic(this);
     }
+    
+    
+    
+		
+	MultiComponent* toMulti() { return toMulti(this); }
+    
 
     static void getAtomicModelList(BaseModel* model,
                                    std::vector<AtomicModel*>& list);
+                                   
+    static void getModelList(BaseModel* model,
+                                       std::vector < AtomicModel* >& list,
+                                       std::vector < MultiComponent* >& list2,
+                                       std::vector < Component* >& list3);
+    static void getComponentlist(BaseModel* model,
+                                       std::vector < Component* >& list);                                                                  
 
     /**
      * return true if model m is present in Model List

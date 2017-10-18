@@ -38,6 +38,7 @@ namespace vle {
 namespace devs {
 
 class Simulator;
+class SimulatorAtomic;
 }
 } // namespace vle devs
 
@@ -271,7 +272,7 @@ public:
         m_debug = false;
     }
 
-    inline devs::Simulator* get_simulator() const noexcept
+    inline devs::SimulatorAtomic* get_simulator() const noexcept
     {
         return m_simulator;
     }
@@ -280,10 +281,10 @@ public:
      * \c devs::Simulator class to assign the m_simulator pointer
      * without providing a specific API for this.
      */
-    friend devs::Simulator;
-
+  
+	friend devs::SimulatorAtomic;
 private:
-    devs::Simulator* m_simulator;
+    devs::SimulatorAtomic* m_simulator;
     std::vector<std::string> m_conditions;
     std::string m_dynamics;
     std::string m_observables;

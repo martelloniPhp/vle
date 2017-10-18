@@ -54,11 +54,12 @@ void Scheduler::init(Time time)
         // unordered_set.
         //
 
-        if (sim->dynamics()->isExecutive())
+        if ((sim->isAtomic()) && (sim->dynamics()->isExecutive()))
             m_current_bag.executives.emplace_back(sim);
         else
             m_current_bag.dynamics.emplace_back(sim);
 
+		
         m_current_bag.unique_simulators.emplace(sim);
 
         sim->setInternalEvent();
@@ -174,7 +175,7 @@ Scheduler::makeNextBag()
         //
 
 
-        if (sim->dynamics()->isExecutive())
+        if ((sim->isAtomic()) && (sim->dynamics()->isExecutive()))
             m_current_bag.executives.emplace_back(sim);
         else
             m_current_bag.dynamics.emplace_back(sim);

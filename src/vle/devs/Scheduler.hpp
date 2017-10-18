@@ -103,18 +103,11 @@ struct HeapElementCompare
     }
 };
 
-<<<<<<< HEAD
-struct HeapElement {
-    HeapElement(Time time, Simulator *Simulator)
-        : m_time(time)
-        , m_simulator(Simulator)
-=======
 struct HeapElement
 {
     HeapElement(Time time, Simulator* Simulator)
       : m_time(time)
       , m_simulator(Simulator)
->>>>>>> 7a80e7dfda3b977bb00912260315670db65be4f1
     {
     }
 
@@ -132,7 +125,6 @@ using HandleT = Heap::handle_type;
  * @brief Bag stores \e Simulator that need to be call in this bag.
  *
  */
-<<<<<<< HEAD
 struct Bag
 {
     std::vector<Simulator*> dynamics;

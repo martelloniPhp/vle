@@ -69,7 +69,7 @@ void RootCoordinator::init()
 
 bool RootCoordinator::run()
 {
-    m_currentTime = m_coordinator->getCurrentTime();
+	m_currentTime = m_coordinator->getCurrentTime();
 
     if (isInfinity(m_currentTime))
         return false;

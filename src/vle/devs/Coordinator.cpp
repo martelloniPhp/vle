@@ -96,8 +96,8 @@ Coordinator::init(const vpz::Model& mdls, Time current, Time duration)
     buildViews();
     addModels(mdls);
     m_isStarted = true;
-
     m_eventTable.init(current);
+
 }
 
 void Coordinator::run()
@@ -117,7 +117,7 @@ void Coordinator::run()
 
     const std::size_t nb_dynamics = bag.dynamics.size();
     const std::size_t nb_executive = bag.executives.size();
-    //std::cout << "run: nb_dynamics = "<< nb_dynamics << std::endl;
+    
 
 
     if (nb_dynamics > 0) {
@@ -438,15 +438,6 @@ void Coordinator::removeSimulatorTargetPort(vpz::AtomicModel* model,
 }
 
 
-Simulator* Coordinator::addModel(vpz::AtomicModel* model)
-{
-    assert(model && "Coordinator: nullptr model to add?");
-
-    m_simulators.emplace_back(std::make_unique<Simulator>(model));
-
-    return m_simulators.back().get();
-}
-
 Simulator* Coordinator::addMulticomponent(vpz::MultiComponent *model)
 {
     assert(model && "Coordinator: nullptr model to add?");
@@ -455,6 +446,26 @@ Simulator* Coordinator::addMulticomponent(vpz::MultiComponent *model)
 
     return m_simulators.back().get();
 }
+
+Simulator* Coordinator::addAtomicModel(vpz::AtomicModel *model)
+{
+     assert(model && "Coordinator: nullptr model to add?");
+
+    m_simulators.emplace_back(std::make_unique<SimulatorAtomic>(model));
+
+    return m_simulators.back().get();
+}
+
+/*Simulator* Coordinator::addModel(vpz::AtomicModel* model)
+{
+    assert(model && "Coordinator: nullptr model to add?");
+
+    m_simulators.emplace_back(std::make_unique<SimulatorAtomic>(model));
+
+    return m_simulators.back().get();
+}
+
+*/
 
 ///
 /// Private functions.
@@ -581,7 +592,7 @@ void Coordinator::processInit(Simulator* simulator)
 		std::cout << "- "<< sim->getName() << std::endl;
 	}*/
 
-    }
+    
 }
 
 std::unique_ptr<value::Map> Coordinator::finish()

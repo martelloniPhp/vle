@@ -1032,7 +1032,7 @@ void SaxStackVpz::popClass()
 }
 
 
-vpz::Base* *axStackVpz::pop()
+vpz::Base* SaxStackVpz::pop()
 {
     vpz::Base* top = parent();
     m_stack.pop_front();

@@ -505,6 +505,7 @@ BaseModel::renameOutputPort(const std::string& old_name,
 
     auto it(m_outPortList.find(new_name));
     if (it == m_outPortList.end()) {
+        if (isCoupled()) {
             CoupledModel* cpl = static_cast<CoupledModel*>(this);
             cpl->getInternalOutputPortList().insert(
               ConnectionList::value_type(new_name, internalConnect));
@@ -710,8 +711,7 @@ MultiComponent* BaseModel::toMulti(BaseModel* model)
     return nullptr;
 }
 
-void BaseModel::getModelList(BaseModel* model,
-                               AtomicModelVector& list, MulticomponentVector& list2,ComponentVector& list3)
+void BaseModel::getModelList(BaseModel* model, AtomicModelVector& list, MulticomponentVector& list2,ComponentVector& list3)
 {
 	//std::cout<<"getmodelList"<< std::endl;
     if (model->isAtomic()) {

@@ -45,7 +45,6 @@
 #include <vle/utils/State.hpp>
 #include <vle/vle.hpp>
 #include <vle/vpz/MultiComponent.hpp>
-#include <vle/devs/AbstractDynamics.hpp>
 #include <map>
 
 #define DECLARE_DYNAMICSCOMP(mdl)                                                 \

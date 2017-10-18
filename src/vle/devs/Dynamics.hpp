@@ -48,17 +48,16 @@
 
 #define DECLARE_DYNAMICS(mdl)                                                 \
     extern "C" {                                                              \
-    VLE_MODULE vle::devs::Dynamics* vle_make_new_dynamics(                    \
-      const vle::devs::DynamicsInit& init,                                    \
-      const vle::devs::InitEventList& events)                                 \
+    VLE_MODULE vle::devs::Dynamics *                                          \
+    vle_make_new_dynamics(const vle::devs::DynamicsInit &init,                \
+                          const vle::devs::InitEventList &events)             \
     {                                                                         \
         return new mdl(init, events);                                         \
     }                                                                         \
                                                                               \
-
-    VLE_MODULE void vle_api_level(std::uint32_t* major,                       \
-                                  std::uint32_t* minor,                       \
-                                  std::uint32_t* patch)                       \
+    VLE_MODULE void vle_api_level(std::uint32_t *major,                       \
+                                  std::uint32_t *minor,                       \
+                                  std::uint32_t *patch)                       \
     {                                                                         \
         auto version = vle::version();                                        \
         *major = std::get<0>(version);                                        \

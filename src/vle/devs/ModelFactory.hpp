@@ -275,7 +275,6 @@ private:
      * @return A pointer to the allocated dynamics.
      * @throw Exception::Internal if XML cannot be parse.
      */
-<<<<<<< HEAD
     std::unique_ptr<Dynamics> attachDynamics(Coordinator &coordinator,
                                              devs::Simulator *atom,
                                              const vpz::Dynamic &dyn,

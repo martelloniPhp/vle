@@ -76,7 +76,7 @@ ModelFactory::createModel(Coordinator& coordinator,
                           const std::string& observable)
 {
     const vpz::Dynamic& dyn = mDynamics.get(dynamics);
-    auto sim = coordinator.addModel(model);
+    auto sim = coordinator.addAtomicModel(model);
 
     InitEventList initValues;
 
@@ -327,7 +327,8 @@ assignEventView(std::map<std::string, View>& views,
     for (const auto& elem : lst) {
         const auto& viewnamelist(elem.second.viewnamelist());
         for (const auto& viewname : viewnamelist) {
-
+			 const auto& v = vpzviews.get(viewname);
+			 
             if (v.type() == vpz::View::TIMED)
                 continue;
 
@@ -354,7 +355,6 @@ assignEventView(std::map<std::string, View>& views,
     }
 }
 
-<<<<<<< HEAD
 std::unique_ptr<Dynamics> buildNewDynamics(utils::ContextPtr context,
                                            std::map<std::string, View> &views,
                                            const vpz::Views &vpzviews,

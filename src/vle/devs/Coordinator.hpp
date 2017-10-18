@@ -44,6 +44,7 @@ namespace devs {
 class Executive;
 
 
+
 /**
  * @brief Represent the DEVS Coordinator class. This class provide a non
  * hierarchical DEVS Coordinator ie. all models are in the same coupled
@@ -173,8 +174,10 @@ public:
      *
      * \return A pointer the the newly allocated Simulator.
      */
-    Simulator *addAtomicModel(vpz::AtomicModel* model);
-    Simulator *addMulticomponent(vpz::MultiComponent* model);
+    Simulator* addAtomicModel(vpz::AtomicModel* model);
+   
+    Simulator* addMulticomponent(vpz::MultiComponent* model);
+  // Simulator* addModel(vpz::AtomicModel* model);
 
     //
     ///

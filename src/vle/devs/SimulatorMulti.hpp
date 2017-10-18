@@ -48,7 +48,6 @@ namespace devs
 
 class Dynamics;
 class Simulator;
-class AtomicModel;
 
 /**
  * @brief Represent a couple devs::AtomicModel and devs::Dynamic class to

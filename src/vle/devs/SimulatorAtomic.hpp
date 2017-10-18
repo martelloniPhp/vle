@@ -3,9 +3,9 @@
  * and analysis of complex dynamical systems.
  * http://www.vle-project.org
  *
- * Copyright (c) 2003-2016 Gauthier Quesnel <quesnel@users.sourceforge.net>
- * Copyright (c) 2003-2016 ULCO http://www.univ-littoral.fr
- * Copyright (c) 2007-2016 INRA http://www.inra.fr
+ * Copyright (c) 2003-2017 Gauthier Quesnel <gauthier.quesnel@inra.fr>
+ * Copyright (c) 2003-2017 ULCO http://www.univ-littoral.fr
+ * Copyright (c) 2007-2017 INRA http://www.inra.fr
  *
  * See the AUTHORS or Authors.txt file for copyright owners and
  * contributors
@@ -28,27 +28,23 @@
 #define VLE_DEVS_SIMULATORATOMIC_HPP
 
 #include <vle/DllDefines.hpp>
-#include <vle/devs/Time.hpp>
+#include <vle/devs/Simulator.hpp>
+#include <vle/devs/Dynamics.hpp>
+#include <vle/devs/ExternalEventList.hpp>
 #include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ObservationEvent.hpp>
-#include <vle/devs/ExternalEventList.hpp>
 #include <vle/devs/Scheduler.hpp>
-#include <vle/devs/Dynamics.hpp>
+#include <vle/devs/Time.hpp>
 #include <vle/devs/View.hpp>
 #include <vle/vpz/AtomicModel.hpp>
-#include <vle/devs/Simulator.hpp>
 #include <vle/vpz/MultiComponent.hpp>
-#include <vle/devs/SimulatorMulti.hpp>
 
-namespace vle
-{
-namespace devs
-{
+
+namespace vle {
+namespace devs {
 
 class Dynamics;
 class Simulator;
-class MultiComponent;
-
 
 /**
  * @brief Represent a couple devs::AtomicModel and devs::Dynamic class to
@@ -58,50 +54,88 @@ class MultiComponent;
 class VLE_LOCAL SimulatorAtomic : public Simulator
 {
 public:
-    /*typedef std::pair<SimulatorAtomic *, std::string> TargetSimulator;
-    typedef std::multimap<std::string, TargetSimulator> TargetSimulatorList;
-    typedef TargetSimulatorList::const_iterator const_iterator;
-    typedef TargetSimulatorList::iterator iterator;
-    typedef TargetSimulatorList::size_type size_type;
-    typedef TargetSimulatorList::value_type value_type;*/
+     /**
+     * @brief Build a new devs::Simulator with an empty devs::Dynamics, a
+     * null last time but a vpz::AtomicModel node.
+     * @param a The atomic model.
+     * @throw utils::InternalError if the atomic model does not exist.
+     */
+    SimulatorAtomic(vpz::AtomicModel* a);
 
-   
-    SimulatorAtomic(vpz::AtomicModel *a);
-
+    /**
+     * @brief Delete the attached devs::Dynamics user's model.
+     */
     ~SimulatorAtomic() = default;
 
- 
+    /**
+     * @brief Assign a new dynamics to the current Simulator. If a dynamic
+     * already exists, it will be delete.
+     * @param dynamics The new dynamics.
+     */
     void addDynamics(std::unique_ptr<Dynamics> dynamics) override;
-    void addDynamics(std::unique_ptr<DynamicsComp> dynamics) override;
+	void addDynamics(std::unique_ptr<DynamicsComp> dynamics) override;
+    /**
+     * @brief Get the name of the vpz::AtomicModel node.
+     * @return the name of the vpz::AtomicModel.
+     * @throw utils::InternalEvent if the model is destroyed.
+     */
+    const std::string& getName() const override;
 
- 
-    const std::string &getName() const override;
-
-    vpz::AtomicModel *getStructure() const 
+    /**
+     * @brief Get the atomic model attached to the Simulator.
+     * @return A reference.
+     */
+    vpz::AtomicModel* getStructure() const 
     {
         return m_atomicModel;
     }
-	vpz::MultiComponent *getStruc() const 
+	vpz::MultiComponent* getStruc() const 
     {
         return nullptr;
     }
-    
-    const std::unique_ptr<Dynamics> &dynamics() const override
+
+    /**
+     * @brief Return a constant reference to the devs::Dynamics.
+     * @return
+     */
+    const std::unique_ptr<Dynamics>& dynamics() const override
     {
         return m_dynamics;
     }
 
-    
-    void updateSimulatorTargets(const std::string &port) override; 
+    /*-*-*-*-*-*-*-*-*-*/
 
-   
-    std::pair<iterator, iterator> targets(const std::string &port) override;
+    /**
+     * Browse model's structure to find Simulator connected to the
+     * specified output port.
+     *
+     * \param port The output port used to build simulators' target list.
+     */
+    void updateSimulatorTargets(const std::string& port) override;
 
-    void removeTargetPort(const std::string &port) override;
+    /**
+     * Get begin and end iterators to find Simulator connected to the
+     * specified output port.
+     *
+     * \param port The output port to get the simulators' target list.
+     *
+     * \return Two iterators.
+     */
+    std::pair<iterator, iterator> targets(const std::string& port) override;
 
- 
-    void addTargetPort(const std::string &port) override;
+    /**
+     * @brief Add an empty target port.
+     * @param port Name of the port.
+     */
+    void removeTargetPort(const std::string& port) override;
 
+    /**
+     * @brief Remove a target port.
+     * @param port Name of the port to remove.
+     */
+    void addTargetPort(const std::string& port) override;
+
+    /*-*-*-*-*-*-*-*-*-*/
 
     Time init(Time time) override;
     Time timeAdvance() override;
@@ -110,83 +144,80 @@ public:
     Time internalTransition(Time time) override;
     Time externalTransition(Time time) override;
     Time confluentTransitions(Time time) override;
-    std::unique_ptr<value::Value>
-    observation(const ObservationEvent &event) const  override; 
+    std::unique_ptr<value::Value> observation(
+      const ObservationEvent& event) const override;
 
-     const ExternalEventList &result() const noexcept override
+    inline const ExternalEventList& result() const noexcept override
     {
         return m_result;
     }
 
-     void clear_result() noexcept override
+    inline void clear_result() noexcept override
     {
         m_result.clear();
     }
 
-     Time getTn() const noexcept override
+    inline Time getTn() const noexcept override
     {
         return m_tn;
     }
 
-     HandleT handle() const noexcept override
+    inline HandleT handle() const noexcept override
     {
         assert(m_have_handle && "Simulator: handle is not defined");
         return m_handle;
     }
 
-     bool haveHandle() const noexcept override
+    inline bool haveHandle() const noexcept override
     {
         return m_have_handle;
     }
 
-     void setHandle(HandleT handle) noexcept override
+    inline void setHandle(HandleT handle) noexcept override
     {
         m_have_handle = true;
         m_handle = handle;
     }
 
-     void resetHandle() noexcept override
+    inline void resetHandle() noexcept override
     {
         m_have_handle = false;
     }
 
-     bool haveExternalEvents() const noexcept override
+    inline bool haveExternalEvents() const noexcept override
     {
         return not m_external_events.empty();
     }
 
-     void addExternalEvents(std::shared_ptr<value::Value> values,
-                                  const std::string &portname) override
+    inline void addExternalEvents(std::shared_ptr<value::Value> values,
+                                  const std::string& portname) override
     {
         m_external_events.emplace_back(values, portname);
     }
 
-     void setInternalEvent() noexcept override
+    inline void setInternalEvent() noexcept override
     {
         m_have_internal = true;
     }
 
-     bool haveInternalEvent() const noexcept override
+    inline bool haveInternalEvent() const noexcept override
     {
         return m_have_internal;
     }
 
-     void resetInternalEvent() noexcept override
+    inline void resetInternalEvent() noexcept override
     {
         m_have_internal = false;
     }
 
-     std::vector<Observation> &getObservations() noexcept override
+    std::vector<Observation>& getObservations() noexcept override
     {
         return m_observations;
     }
- virtual bool isAtomic() const override { 
-			
-			return true; }
+
 private:
-	vpz::AtomicModel *m_atomicModel;
     std::unique_ptr<Dynamics> m_dynamics;
-   
+    vpz::AtomicModel* m_atomicModel;
     TargetSimulatorList mTargets;
     ExternalEventList m_external_events;
     ExternalEventList m_result;
